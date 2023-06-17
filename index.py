@@ -61,20 +61,25 @@ class MonitorService(win32serviceutil.ServiceFramework):
                 entries = data["data"]
 
                 ping_results = []
-                tasks = [asyncping(entry["svr_ip_ip_address"]) for entry in entries]
+                tasks = [asyncping(entry["svr_ip_ip_address"])
+                         for entry in entries]
                 results = await asyncio.gather(*tasks)
 
                 for result in results:
                     ping_results.append(result)
 
-                ping_results_dict = [ping_result.__dict__ for ping_result in ping_results]
-                server_data = ServerData(get_computer_name(), get_physical_memory()+"MB", getPCSpace(), GetCpuUsage() + "%", getAvailableRAM() + "MB")
+                ping_results_dict = [
+                    ping_result.__dict__ for ping_result in ping_results]
+                server_data = ServerData(get_computer_name(), get_physical_memory(
+                )+"MB", getPCSpace(), GetCpuUsage() + "%", getAvailableRAM() + "MB")
                 server_data_dict = server_data.__dict__
-                data_to_post = DataToPost(license_key, org_id, server_data_dict, ping_results_dict)
+                data_to_post = DataToPost(
+                    license_key, org_id, server_data_dict, ping_results_dict)
 
                 json_string = json.dumps(data_to_post, cls=DataToPostEncoder)
 
-                send_json_to_endpoint(postUrl, json_string, proxyHost, proxyPort, 'monitor.log')
+                send_json_to_endpoint(
+                    postUrl, json_string, proxyHost, proxyPort, 'monitor.log')
                 with open('log.json', 'w') as file:
                     file.write(json_string)
 
