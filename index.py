@@ -10,6 +10,7 @@ import datetime
 import json
 from data.getdata import LoadContent
 from data.datamodel import DataToPost, DataToPostEncoder, PingResult, ServerData, ServerDataEncoder
+from logger.log import LogActivities
 from utils.ping import asyncping
 from utils.postdata import PostRequest
 from utils.winmonitor import get_available_ram, get_computer_name, get_cpu_usage, get_pc_space, get_physical_memory
@@ -34,7 +35,7 @@ class MonitorService(win32serviceutil.ServiceFramework):
         servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE,
                               servicemanager.PYS_SERVICE_STARTED,
                               (self._svc_name_, ''))
-        self.main()
+
 
     async def main(self):
         content_path = os.path.join("data", "content.json")
@@ -48,6 +49,8 @@ class MonitorService(win32serviceutil.ServiceFramework):
         proxyHost = data["proxyHost"]
         proxyPort = data["proxyPort"]
         while self.is_running:
+            print("Session Start")
+            LogActivities("Monitoring: New session started...")
             try:
                 if os.path.exists(content_path):
                     print("loading file")
@@ -62,6 +65,8 @@ class MonitorService(win32serviceutil.ServiceFramework):
                 org_id = data["orgID"]
                 entries = data["data"]
 
+
+                LogActivities("Pinging server ips.")
                 ping_results = []
                 tasks = [asyncping(entry["svr_ip_ip_address"])
                          for entry in entries]
@@ -80,15 +85,17 @@ class MonitorService(win32serviceutil.ServiceFramework):
 
                 json_string = json.dumps(data_to_post, cls=DataToPostEncoder)
 
+                LogActivities("Sending data to cloud")
                 PostRequest(
                     postUrl, json_string, proxyHost, proxyPort)
                 with open(log_path, 'w') as file:
                     file.write(json_string)
-
+                
                 await asyncio.sleep(60)  # Sleep for 60 seconds
-
+                LogActivities("Monitoring: Session end...")
             except Exception as e:
                 servicemanager.LogErrorMsg(str(e))
+                LogActivities(f"An error occurred: {str(e)}")
 
 
 if __name__ == '__main__':
