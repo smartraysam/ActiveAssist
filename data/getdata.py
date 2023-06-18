@@ -1,9 +1,12 @@
+import os
 import requests
-def loadContent(url):
+
+
+def LoadContent(url):
     response = requests.get(url)
     if response.status_code == 200:
         json_data = response.json()
-        with open("content.json", "w") as file:
+        with open(os.path.join("data", "content.json"), "w") as file:
             file.write(response.text)
         print("JSON data saved to content.json")
     else:

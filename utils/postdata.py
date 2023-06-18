@@ -1,9 +1,8 @@
 import requests
 
-from log import logactivities
+from logger.log import LogActivities
 
-
-def send_json_to_endpoint(url, json_string, proxy_host="", proxy_port=""):
+def PostRequest(url, json_string, proxy_host="", proxy_port=""):
     headers = {
         "Content-Type": "application/json"
     }
@@ -31,5 +30,5 @@ def send_json_to_endpoint(url, json_string, proxy_host="", proxy_port=""):
         log = f"An error occurred: {str(e)}\n"
 
     # Append the log to the log file
-    logactivities(log,"monitor.log")
+    LogActivities(log)
 

@@ -8,16 +8,16 @@ import sys
 import asyncio
 import datetime
 import json
-from getConfig import loadContent
-from payloadModel import DataToPost, DataToPostEncoder, PingResult, ServerData, ServerDataEncoder
-from ping import asyncping
-from post2server import send_json_to_endpoint
-from winmonitor import GetCpuUsage, get_computer_name, get_physical_memory, getAvailableRAM, getPCSpace
+from data.getdata import LoadContent
+from data.datamodel import DataToPost, DataToPostEncoder, PingResult, ServerData, ServerDataEncoder
+from utils.ping import asyncping
+from utils.postdata import PostRequest
+from utils.winmonitor import get_available_ram, get_computer_name, get_cpu_usage, get_pc_space, get_physical_memory
 
 
 class MonitorService(win32serviceutil.ServiceFramework):
-    _svc_name_ = 'MonitorService'
-    _svc_display_name_ = 'Monitor Service'
+    _svc_name_ = 'ActiveAssistService'
+    _svc_display_name_ = 'Active Assist Monitor Service'
 
     def __init__(self, args):
         win32serviceutil.ServiceFramework.__init__(self, args)
@@ -37,22 +37,24 @@ class MonitorService(win32serviceutil.ServiceFramework):
         self.main()
 
     async def main(self):
+        content_path = os.path.join("data", "content.json")
+        config_path = os.path.join("data", "config.json")
+        log_path = os.path.join("logger", "log.json")
+        
+        with open(config_path) as json_file:
+            data = json.load(json_file)
+        getUrl = data["getUrl"]
+        postUrl = data["postUrl"]
+        proxyHost = data["proxyHost"]
+        proxyPort = data["proxyPort"]
         while self.is_running:
             try:
-                content_path = 'content.json'
-                with open('config.json') as json_file:
-                    data = json.load(json_file)
-                getUrl = data["getUrl"]
-                postUrl = data["postUrl"]
-                proxyHost = data["proxyHost"]
-                proxyPort = data["proxyPort"]
-
                 if os.path.exists(content_path):
                     print("loading file")
                 else:
-                    loadContent(getUrl)
+                    LoadContent(getUrl)
 
-                with open('content.json') as content_file:
+                with open(content_path) as content_file:
                     data = json.load(content_file)
 
                 # Extract information from the JSON
@@ -71,16 +73,16 @@ class MonitorService(win32serviceutil.ServiceFramework):
                 ping_results_dict = [
                     ping_result.__dict__ for ping_result in ping_results]
                 server_data = ServerData(get_computer_name(), get_physical_memory(
-                )+"MB", getPCSpace(), GetCpuUsage() + "%", getAvailableRAM() + "MB")
+                )+"MB", get_pc_space(), get_cpu_usage() + "%", get_available_ram() + "MB")
                 server_data_dict = server_data.__dict__
                 data_to_post = DataToPost(
                     license_key, org_id, server_data_dict, ping_results_dict)
 
                 json_string = json.dumps(data_to_post, cls=DataToPostEncoder)
 
-                send_json_to_endpoint(
-                    postUrl, json_string, proxyHost, proxyPort, 'monitor.log')
-                with open('log.json', 'w') as file:
+                PostRequest(
+                    postUrl, json_string, proxyHost, proxyPort)
+                with open(log_path, 'w') as file:
                     file.write(json_string)
 
                 await asyncio.sleep(60)  # Sleep for 60 seconds

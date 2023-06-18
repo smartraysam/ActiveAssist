@@ -111,7 +111,7 @@ def get_current_language():
 
 
 
-def getAvailableRAM():
+def get_available_ram():
     remain_ram = ""
     try:
         virtual_memory = psutil.virtual_memory()
@@ -122,7 +122,7 @@ def getAvailableRAM():
     return remain_ram
 
 
-def GetCpuUsage():
+def get_cpu_usage():
     value_use = ""
     try:
         cpu_percent = psutil.cpu_percent(interval=1)
@@ -131,7 +131,7 @@ def GetCpuUsage():
         pass
     return value_use
 
-def getPCSpace():
+def get_pc_space():
     drive_info = psutil.disk_usage('/')
     total_free_space = drive_info.free / (1024 * 1024 * 1024)  # Convert to GB
     return str(total_free_space) + "GB"

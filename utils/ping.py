@@ -1,11 +1,11 @@
 import datetime
 import ping3
 import aioping
-from payloadModel import PingResult
+from data.datamodel import PingResult
 
 
 
-async def asyncping(ip_address):
+async def AsyncPing(ip_address):
     try:
         delay = await aioping.ping(ip_address)
         print(delay)
