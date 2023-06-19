@@ -3,30 +3,34 @@ import datetime
 import os
 import json
 from data.datamodel import DataToPost, DataToPostEncoder, ServerData
+from data.getdata import LoadContent
 from logger.log import LogActivities
 from utils.ping import AsyncPing
 from utils.postdata import PostRequest
 from utils.winmonitor import get_available_ram, get_cpu_usage, get_pc_space, get_computer_name, get_physical_memory
 
 async def main():
-    while True:
-        print("Session Start")
-        LogActivities("Monitoring: New session started...\n")
-        content_path = 'content.json'
-        with open('config.json') as json_file:
-            data = json.load(json_file)
-        getUrl = data["getUrl"]
-        postUrl = data["postUrl"]
-        proxyHost = data["proxyHost"]
-        proxyPort = data["proxyPort"]
+    base_path = "C:\\ActiveAssist\\data"
+    content_path = base_path +"\\content.json"
+    config_path = base_path +"\\config.json"
+    log_path ="C:\\ActiveAssist\\logger\\log.json"
+    with open(config_path) as json_file:
+        data = json.load(json_file)
+    getUrl = data["getUrl"]
+    postUrl = data["postUrl"]
+    proxyHost = data["proxyHost"]
+    proxyPort = data["proxyPort"]
 
+    while True:
+        LogActivities("Monitoring: New session started...\n")
+       
         if os.path.exists(content_path):
             LogActivities("Read local file...\n")
         else:
             LogActivities("Getting remote server...\n")
-            LogActivities(getUrl)
+            LoadContent(getUrl)
 
-        with open('content.json') as content_file:
+        with open(content_path) as content_file:
             data = json.load(content_file)
 
         # Extract information from the JSON
@@ -51,12 +55,10 @@ async def main():
 
         LogActivities("Send to cloud...\n")
         PostRequest(postUrl, json_string, proxyHost, proxyPort)
-        with open("log.json", 'w') as file:
+        with open(log_path, 'w') as file:
             file.write(json_string)
         # Wait for 10 sec before the next iteration
         await asyncio.sleep(10)
         LogActivities("Monitoring: Session ended...\n")
-        print("Session Ended")
-
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())

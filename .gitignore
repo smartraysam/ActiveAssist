@@ -1,5 +1,4 @@
-/config.json
-/content.json
-/log.json
-/monitor.ini
-/monitors.ini
+/data/config.json
+/data/content.json
+/logger/log.json
+/logger/monitor.log

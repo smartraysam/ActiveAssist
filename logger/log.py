@@ -1,12 +1,8 @@
 import datetime
 import os
 
-def LogActivities(log, log_file="monitor.log"):
+def LogActivities(log, log_path="C:\\ActiveAssist\\logger\\monitor.log"):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    log_entry = f"[{timestamp}] {log}\n"
-    log_directory = "logger"
-
-    log_path = os.path.join(log_directory, log_file)
-    
+    log_entry = f"[{timestamp}] {log}\n"    
     with open(log_path, "a") as file:
         file.write(log_entry)
