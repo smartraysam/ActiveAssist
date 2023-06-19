@@ -52,6 +52,8 @@ async def main():
 
         logactivities("Send to cloud...\n")
         send_json_to_endpoint(postUrl, json_string, proxyHost, proxyPort)
+        with open("log.json", 'w') as file:
+            file.write(json_string)
         # Wait for 10 sec before the next iteration
         await asyncio.sleep(10)
         logactivities("Monitoring: Session ended...\n")
