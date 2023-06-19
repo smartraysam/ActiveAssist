@@ -9,9 +9,9 @@ import asyncio
 import datetime
 import json
 from data.getdata import LoadContent
-from data.datamodel import DataToPost, DataToPostEncoder, PingResult, ServerData, ServerDataEncoder
+from data.datamodel import DataToPost, DataToPostEncoder, PingResult, ServerData
 from logger.log import LogActivities
-from utils.ping import asyncping
+from utils.ping import AsyncPing
 from utils.postdata import PostRequest
 from utils.winmonitor import get_available_ram, get_computer_name, get_cpu_usage, get_pc_space, get_physical_memory
 
@@ -68,7 +68,7 @@ class MonitorService(win32serviceutil.ServiceFramework):
 
                 LogActivities("Pinging server ips.")
                 ping_results = []
-                tasks = [asyncping(entry["svr_ip_ip_address"])
+                tasks = [AsyncPing(entry["svr_ip_ip_address"])
                          for entry in entries]
                 results = await asyncio.gather(*tasks)
 
