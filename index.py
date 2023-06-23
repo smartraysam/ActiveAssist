@@ -1,107 +1,107 @@
+import asyncio
+import json
+import os
 import win32serviceutil
 import win32service
 import win32event
 import servicemanager
 import socket
-import os
 import sys
-import asyncio
-import datetime
-import json
+from data.datamodel import DataToPost, DataToPostEncoder, ServerData
 from data.getdata import LoadContent
-from data.datamodel import DataToPost, DataToPostEncoder, PingResult, ServerData
+
 from logger.log import LogActivities
 from utils.ping import AsyncPing
 from utils.postdata import PostRequest
 from utils.winmonitor import get_available_ram, get_computer_name, get_cpu_usage, get_pc_space, get_physical_memory
 
 
-class MonitorService(win32serviceutil.ServiceFramework):
-    _svc_name_ = 'ActiveAssistService'
-    _svc_display_name_ = 'Active Assist Monitor Service'
+class WinService(win32serviceutil.ServiceFramework):
+    _svc_name_ = 'ActiveAssist'
+    _svc_display_name_ = 'ActiveAssist Service'
+
 
     def __init__(self, args):
         win32serviceutil.ServiceFramework.__init__(self, args)
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
         socket.setdefaulttimeout(60)
         self.is_running = True
-
-    def SvcStop(self):
-        self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
-        win32event.SetEvent(self.hWaitStop)
-        self.is_running = False
+        self.base_path = "C:\\ActiveAssist\\data"
+        self.content_path = self.base_path + "\\content.json"
+        self.config_path = self.base_path + "\\config.json"
+        self.log_path = "C:\\ActiveAssist\\logger\\log.json"
+        with open(self.config_path) as json_file:
+            self.data = json.load(json_file)
+        self.getUrl = self.data["getUrl"]
+        self.postUrl = self.data["postUrl"]
+        self.proxyHost = self.data["proxyHost"]
+        self.proxyPort = self.data["proxyPort"]
 
     def SvcDoRun(self):
         servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE,
                               servicemanager.PYS_SERVICE_STARTED,
                               (self._svc_name_, ''))
-
-
-    async def main(self):
-        content_path = os.path.join("data", "content.json")
-        config_path = os.path.join("data", "config.json")
-        log_path = os.path.join("logger", "log.json")
-        
-        with open(config_path) as json_file:
-            data = json.load(json_file)
-        getUrl = data["getUrl"]
-        postUrl = data["postUrl"]
-        proxyHost = data["proxyHost"]
-        proxyPort = data["proxyPort"]
+        # Your project code goes here
         while self.is_running:
-            print("Session Start")
-            LogActivities("Monitoring: New session started...")
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
             try:
-                if os.path.exists(content_path):
-                    print("loading file")
-                else:
-                    LoadContent(getUrl)
+                loop.run_until_complete(main(self))
+            except KeyboardInterrupt:
+                pass
 
-                with open(content_path) as content_file:
-                    data = json.load(content_file)
+    def SvcStop(self):
+        self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
+        win32event.SetEvent(self.hWaitStop)
+        self.is_running = False
+ 
+async def main(self):
+    print("start session monitoring")
+    LogActivities("Monitoring: New session started...\n")
+    
+    if os.path.exists(self.content_path):
+        LogActivities("Read local file...\n")
+    else:
+        LogActivities("Getting remote server...\n")
+        LoadContent(self.getUrl)
 
-                # Extract information from the JSON
-                license_key = data["licenceKey"]
-                org_id = data["orgID"]
-                entries = data["data"]
+    with open(self.content_path) as content_file:
+        data = json.load(content_file)
 
+    # Extract information from the JSON
+    license_key = data["licenceKey"]
+    org_id = data["orgID"]
+    entries = data["data"]
 
-                LogActivities("Pinging server ips.")
-                ping_results = []
-                tasks = [AsyncPing(entry["svr_ip_ip_address"])
-                         for entry in entries]
-                results = await asyncio.gather(*tasks)
+    ping_results = []
+    LogActivities("Pinging server ips...\n")
+    tasks = [AsyncPing(entry["svr_ip_ip_address"]) for entry in entries]
+    results = await asyncio.gather(*tasks)
 
-                for result in results:
-                    ping_results.append(result)
+    for result in results:
+        ping_results.append(result)
 
-                ping_results_dict = [
-                    ping_result.__dict__ for ping_result in ping_results]
-                server_data = ServerData(get_computer_name(), get_physical_memory(
-                )+"MB", get_pc_space(), get_cpu_usage() + "%", get_available_ram() + "MB")
-                server_data_dict = server_data.__dict__
-                data_to_post = DataToPost(
-                    license_key, org_id, server_data_dict, ping_results_dict)
+    ping_results_dict = [ping_result.__dict__ for ping_result in ping_results]
+    server_data = ServerData(get_computer_name(), get_physical_memory()+"MB", get_pc_space(), get_cpu_usage() + "%", get_available_ram() + "MB")
+    server_data_dict = server_data.__dict__
+    data_to_post = DataToPost(license_key, org_id, server_data_dict, ping_results_dict)
 
-                json_string = json.dumps(data_to_post, cls=DataToPostEncoder)
+    json_string = json.dumps(data_to_post, cls=DataToPostEncoder)
 
-                LogActivities("Sending data to cloud")
-                PostRequest(
-                    postUrl, json_string, proxyHost, proxyPort)
-                with open(log_path, 'w') as file:
-                    file.write(json_string)
-                
-                await asyncio.sleep(60)  # Sleep for 60 seconds
-                LogActivities("Monitoring: Session end...")
-            except Exception as e:
-                servicemanager.LogErrorMsg(str(e))
-                LogActivities(f"An error occurred: {str(e)}")
+    LogActivities("Send to cloud...\n")
+    PostRequest(self.postUrl, json_string, self.proxyHost, self.proxyPort)
+    with open(self.log_path, 'w') as file:
+        file.write(json_string)
+    # Wait for 10 sec before the next iteration
+    await asyncio.sleep(10)
+    LogActivities("Monitoring: Session ended...\n")
+
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
         servicemanager.Initialize()
-        servicemanager.PrepareToHostSingle(MonitorService)
+        servicemanager.PrepareToHostSingle(WinService)
         servicemanager.StartServiceCtrlDispatcher()
     else:
-        win32serviceutil.HandleCommandLine(MonitorService)
+        win32serviceutil.HandleCommandLine(WinService)
