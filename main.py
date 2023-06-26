@@ -93,10 +93,9 @@ async def main(self):
     PostRequest(self.postUrl, json_string, self.proxyHost, self.proxyPort)
     with open(self.log_path, 'w') as file:
         file.write(json_string)
-    # Wait for 10 sec before the next iteration
-    await asyncio.sleep(10)
     LogActivities("Monitoring: Session ended...\n")
-
+    # Wait for 10 sec before the next iteration
+    await asyncio.sleep(300)
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
