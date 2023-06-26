@@ -3,6 +3,6 @@
     "postUrl": "https://portal.active-assist.com/ipdata.php",
     "licenseKey": "12346789",
     "orgID": 4,
-    "proxyHost": "",
-    "proxyPort": ""
-  }
+    "proxyHost": "74.54.32.45",
+    "proxyPort": "8080"
+}
