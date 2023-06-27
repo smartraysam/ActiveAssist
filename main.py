@@ -18,7 +18,7 @@ from utils.winmonitor import get_available_ram, get_computer_name, get_cpu_usage
 
 class AssistService(win32serviceutil.ServiceFramework):
     _svc_name_ = 'ActiveAssist'
-    _svc_display_name_ = 'ActiveAssist Service'
+    _svc_display_name_ = 'Active Assist Service'
 
     def __init__(self, args):
         win32serviceutil.ServiceFramework.__init__(self, args)
@@ -29,12 +29,7 @@ class AssistService(win32serviceutil.ServiceFramework):
         self.content_path = self.base_path + "\\content.json"
         self.config_path = self.base_path + "\\config.json"
         self.log_path = "C:\\ActiveAssist\\logger\\log.json"
-        with open(self.config_path) as json_file:
-            self.data = json.load(json_file)
-        self.getUrl = self.data["getUrl"]
-        self.postUrl = self.data["postUrl"]
-        self.proxyHost = self.data["proxyHost"]
-        self.proxyPort = self.data["proxyPort"]
+      
 
     def SvcDoRun(self):
         servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE,
@@ -55,6 +50,12 @@ class AssistService(win32serviceutil.ServiceFramework):
 
 
 async def main(self):
+    with open(self.config_path) as json_file:
+        self.data = json.load(json_file)
+    self.getUrl = self.data["getUrl"]
+    self.postUrl = self.data["postUrl"]
+    self.proxyHost = self.data["proxyHost"]
+    self.proxyPort = self.data["proxyPort"]
     print("start session monitoring")
     LogActivities("Monitoring: New session started...\n")
 
