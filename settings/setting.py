@@ -29,6 +29,7 @@ def save_config(config):
 def save_button_clicked():
     proxy_host = entry_proxy_host.get()
     proxy_port = entry_proxy_port.get()
+    license_key = entry_license_key.get()
 
     config = load_config()
     if config is None:
@@ -36,6 +37,7 @@ def save_button_clicked():
 
     config["proxyHost"] = proxy_host
     config["proxyPort"] = proxy_port
+    config["licenseKey"] = license_key
 
     save_config(config)
     status_label.config(text="Configuration saved successfully")
@@ -71,7 +73,13 @@ label_proxy_port = tk.Label(root, text="Proxy Port:")
 label_proxy_port.pack()
 entry_proxy_port = tk.Entry(root, width=30)
 entry_proxy_port.insert(tk.END, config["proxyPort"])
-entry_proxy_port.pack(pady=10)
+entry_proxy_port.pack()
+
+label_license_key = tk.Label(root, text="License Key:")
+label_license_key.pack()
+entry_license_key = tk.Entry(root, width=30)
+entry_license_key.insert(tk.END, config["licenseKey"])
+entry_license_key.pack(pady=10)
 
 # Create save button
 save_button = tk.Button(

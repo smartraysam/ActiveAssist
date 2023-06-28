@@ -17,6 +17,10 @@ set "src=%~dp0"
 echo Copying folders from %src% to %dest%...
 xcopy /E /I "%src%" "%dest%"
 
+echo Installing Python packages from requirements file...
+pip install -r "%dest%\requirements.txt"
+
+
 echo Starting Python Windows service...
 python "%dest%\main.py" install
 python "%dest%\main.py" start

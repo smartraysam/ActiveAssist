@@ -42,7 +42,7 @@ class AssistService(win32serviceutil.ServiceFramework):
                 loop.run_until_complete(main(self))
             except KeyboardInterrupt:
                 pass
-
+ 
     def SvcStop(self):
         self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
         win32event.SetEvent(self.hWaitStop)
