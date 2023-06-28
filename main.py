@@ -56,7 +56,7 @@ async def main(self):
     self.postUrl = self.data["postUrl"]
     self.proxyHost = self.data["proxyHost"]
     self.proxyPort = self.data["proxyPort"]
-    print("start session monitoring")
+    self.licenceKey = self.data["licenceKey"]
     LogActivities("Monitoring: New session started...\n")
 
     if os.path.exists(self.content_path):
