@@ -1,6 +1,7 @@
-aioping==0.3.1
-psutil==5.9.5
-pywin32==306
-requests==2.24.0
-servicemanager==2.0.10
-WMI==1.5.1
+aioping
+psutil
+pywin32
+tk
+requests
+servicemanager
+WMI
