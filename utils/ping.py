@@ -1,5 +1,4 @@
 import datetime
-import ping3
 import aioping
 from data.datamodel import PingResult
 
