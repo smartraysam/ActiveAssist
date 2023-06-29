@@ -56,7 +56,7 @@ async def main(self):
     self.postUrl = self.data["postUrl"]
     self.proxyHost = self.data["proxyHost"]
     self.proxyPort = self.data["proxyPort"]
-    self.licenceKey = self.data["licenceKey"]
+    self.licenseKey = self.data["licenseKey"]
     LogActivities("Monitoring: New session started...\n")
 
     if os.path.exists(self.content_path):
@@ -70,6 +70,9 @@ async def main(self):
 
     # Extract information from the JSON
     license_key = data["licenceKey"]
+    if self.licenseKey != license_key:
+        LogActivities("Invalid License key, Update License key using the setting\n")
+        return
     org_id = data["orgID"]
     entries = data["data"]
 
