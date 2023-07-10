@@ -4,3 +4,5 @@ pywin32
 tk
 requests
 wmi
+Rays
+ping3

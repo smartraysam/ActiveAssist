@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import ray
 import win32serviceutil
 import win32service
 import win32event
@@ -13,7 +14,7 @@ from data.datamodel import DataToPost, DataToPostEncoder, ServerData
 from data.getdata import LoadContent
 
 from logger.log import LogActivities
-from utils.ping import AsyncPing
+from utils.ping import AsyncPing, ping_ip_address
 from utils.postdata import PostRequest
 from utils.winmonitor import get_available_ram, get_computer_name, get_cpu_usage, get_pc_space, get_physical_memory
 
@@ -26,6 +27,7 @@ class AssistService(win32serviceutil.ServiceFramework):
         win32serviceutil.ServiceFramework.__init__(self, args)
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
         socket.setdefaulttimeout(60)
+        ray.init()
         self.is_running = True
         self.base_path = "C:\\ActiveAssist\\data"
         self.content_path = self.base_path + "\\content.json"
@@ -60,13 +62,11 @@ async def main(self):
     LogActivities("Monitoring: New session started...\n")
 
     LoadContent(self.getUrl)
-
     with open(self.content_path) as content_file:
         data = json.load(content_file)
 
     # Extract information from the JSON
     license_key = data["licenceKey"]
-
     if license_key != self.licenseKey:
         LogActivities("Invalid License Key, Update the key from the setting\n")
         return
@@ -75,9 +75,8 @@ async def main(self):
 
     ping_results = []
     LogActivities("Pinging server ips...\n")
-    tasks = [AsyncPing(entry["svr_ip_ip_address"]) for entry in entries]
-    
-    results = await asyncio.gather(*tasks)
+    tasks = [ping_ip_address(entry["svr_ip_ip_address"]) for entry in entries]
+    results = ray.get(tasks)
 
     for result in results:
         ping_results.append(result)
