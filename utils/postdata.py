@@ -19,6 +19,7 @@ def PostRequest(url, json_string, proxy_host="", proxy_port=""):
                 url, data=json_string, headers=headers, proxies=proxies)
         else:
             response = requests.post(url, data=json_string, headers=headers)
+        LogActivities(response.text)
 
         if response.status_code == 200:
             log = "JSON string sent successfully!\n"

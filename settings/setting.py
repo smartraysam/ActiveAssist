@@ -41,6 +41,7 @@ def save_button_clicked():
 
     save_config(config)
     status_label.config(text="Configuration saved successfully")
+    messagebox.showinfo("succes", "Configuration saved successfully")
 
 # Load config
 config = load_config()
@@ -50,14 +51,14 @@ if config is None:
 # Create GUI
 root = tk.Tk()
 root.title("Proxy Configuration")
-root.geometry("400x200")
+root.geometry("400x280")
 root.resizable(False, False)
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
 # Calculate the x and y position to center the window
 x = int((screen_width - 400) / 2)
-y = int((screen_height - 200) / 2)
+y = int((screen_height - 280) / 2)
 
 # Set the window position
 root.geometry(f"400x200+{x}+{y}")
@@ -84,7 +85,7 @@ entry_license_key.pack(pady=10)
 # Create save button
 save_button = tk.Button(
     root, text="Save", command=save_button_clicked, width=30)
-save_button.pack(pady=20)
+save_button.pack(pady=10)
 
 status_label = tk.Label(root, text="")
 status_label.pack()

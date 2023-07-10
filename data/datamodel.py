@@ -17,9 +17,10 @@ class ServerData:
         self.RamFree = ram_free
 
 class DataToPost:
-    def __init__(self, license_key, org_id, server_data, ping_result):
-        self.licenceKey = license_key
+    def __init__(self, license_key, org_id, server_id, server_data, ping_result):
+        self.LicenceKey = license_key
         self.OrgID = org_id
+        self.ServerID = server_id
         self.Serverdata = server_data
         self.Pingresult = ping_result
 

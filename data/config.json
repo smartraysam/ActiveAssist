@@ -1,8 +1,9 @@
 {
     "getUrl": "https://portal.active-assist.com/orgfolders/gsk/ip_addresses_55042.json",
     "postUrl": "https://portal.active-assist.com/ipdata.php",
-    "licenseKey": "12346789",
+    "licenseKey": "123456789",
     "orgID": 4,
-    "proxyHost": "87.65.33.22",
-    "proxyPort": "8080"
+    "serverID": "1",
+    "proxyHost": "",
+    "proxyPort": ""
 }

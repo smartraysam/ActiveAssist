@@ -7,6 +7,8 @@ import win32event
 import servicemanager
 import socket
 import sys
+
+
 from data.datamodel import DataToPost, DataToPostEncoder, ServerData
 from data.getdata import LoadContent
 
@@ -35,13 +37,10 @@ class AssistService(win32serviceutil.ServiceFramework):
         servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE,
                               servicemanager.PYS_SERVICE_STARTED,
                               (self._svc_name_, ''))
+           
         while self.is_running:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                loop.run_until_complete(main(self))
-            except KeyboardInterrupt:
-                pass
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(main(self))
  
     def SvcStop(self):
         self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
@@ -57,13 +56,10 @@ async def main(self):
     self.proxyHost = self.data["proxyHost"]
     self.proxyPort = self.data["proxyPort"]
     self.licenseKey = self.data["licenseKey"]
+    self.server_id = self.data["serverID"]
     LogActivities("Monitoring: New session started...\n")
 
-    if os.path.exists(self.content_path):
-        LogActivities("Read local file...\n")
-    else:
-        LogActivities("Getting remote server...\n")
-        LoadContent(self.getUrl)
+    LoadContent(self.getUrl)
 
     with open(self.content_path) as content_file:
         data = json.load(content_file)
@@ -80,6 +76,7 @@ async def main(self):
     ping_results = []
     LogActivities("Pinging server ips...\n")
     tasks = [AsyncPing(entry["svr_ip_ip_address"]) for entry in entries]
+    
     results = await asyncio.gather(*tasks)
 
     for result in results:
@@ -90,7 +87,7 @@ async def main(self):
     )+"MB", get_pc_space(), get_cpu_usage() + "%", get_available_ram() + "MB")
     server_data_dict = server_data.__dict__
     data_to_post = DataToPost(
-        license_key, org_id, server_data_dict, ping_results_dict)
+        license_key, org_id, self.server_id, server_data_dict, ping_results_dict)
 
     json_string = json.dumps(data_to_post, cls=DataToPostEncoder)
 
@@ -100,7 +97,7 @@ async def main(self):
         file.write(json_string)
     LogActivities("Monitoring: Session ended...\n")
     # Wait for 10 sec before the next iteration
-    await asyncio.sleep(300)
+    await asyncio.sleep(30)
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:

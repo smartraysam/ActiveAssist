@@ -1,13 +1,14 @@
 import os
 import requests
 
+from logger.log import LogActivities
 
 def LoadContent(url):
     response = requests.get(url)
+    content ="C:\\ActiveAssist\\data\\content.json"
     if response.status_code == 200:
-        json_data = response.json()
-        with open(os.path.join("data", "content.json"), "w") as file:
+        with open(content, "w") as file:
             file.write(response.text)
-        print("JSON data saved to content.json")
+        LogActivities("Content data retrieved \n")
     else:
-        print("Error retrieving JSON data. Status code:", response.status_code)
+        LogActivities("Error retrieving JSON data.")

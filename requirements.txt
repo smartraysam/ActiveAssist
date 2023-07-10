@@ -3,5 +3,4 @@ psutil
 pywin32
 tk
 requests
-servicemanager
-WMI
+wmi
