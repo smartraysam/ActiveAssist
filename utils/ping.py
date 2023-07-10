@@ -1,10 +1,10 @@
 import datetime
 import socket
-
-import ray
 from data.datamodel import PingResult
 import ping3
 import aioping
+from logger.log import LogActivities
+
 
 async def AsyncPing(ip_address):
     try:

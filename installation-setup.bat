@@ -3,6 +3,7 @@
 REM Set the directory path
 set "dest=C:\ActiveAssist"
 set "src=%~dp0"
+set "pythonInstallationDir=%LocalAppData%\Programs\Python\Python310"
 
 echo Checking if Python is installed...
 REM Install Python
@@ -31,12 +32,12 @@ echo Copying folders from %src% to %dest%...
 xcopy /E /I "%src%" "%dest%"
 
 echo Installing Python packages from requirements file...
-"python.exe" -m pip install -r "%src%\requirements.txt"
+"%pythonInstallationDir%\python.exe" -m pip install -r "%dest%\requirements.txt"
 
 
 echo Starting Python Windows service...
-"python.exe" "%dest%\main.py" install
-"python.exe" "%dest%\main.py" start
+"%pythonInstallationDir%\python.exe" "%dest%\main.py" install
+"%pythonInstallationDir%\python.exe" "%dest%\main.py" start
 
 echo Configuring automatic startup for the service...
 sc config ActiveAssist start=auto
