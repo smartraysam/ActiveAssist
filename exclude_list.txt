@@ -1,0 +1,6 @@
+installation-setup.bat
+packages\
+data\content.json
+logger\log.json
+.gitignore
+requirements.txt

@@ -1,5 +1,6 @@
 import asyncio
 import json
+import multiprocessing
 import os
 import win32serviceutil
 import win32service
@@ -13,7 +14,7 @@ from data.datamodel import DataToPost, DataToPostEncoder, ServerData
 from data.getdata import LoadContent
 
 from logger.log import LogActivities
-from utils.ping import AsyncPing
+from utils.ping import ping_ip_address
 from utils.postdata import PostRequest
 from utils.winmonitor import get_available_ram, get_computer_name, get_cpu_usage, get_pc_space, get_physical_memory
 
@@ -75,10 +76,10 @@ async def main(self):
 
     ping_results = []
     LogActivities("Pinging server ips...\n")
-    tasks = [AsyncPing(entry["svr_ip_ip_address"]) for entry in entries]
-    
-    results = await asyncio.gather(*tasks)
 
+    with multiprocessing.Pool(processes=50) as pool:
+            results = pool.map(ping_ip_address, [entry["svr_ip_ip_address"] for entry in entries])
+            
     for result in results:
         ping_results.append(result)
 

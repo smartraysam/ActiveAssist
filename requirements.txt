@@ -4,3 +4,4 @@ pywin32
 tk
 requests
 wmi
+ping3

@@ -3,12 +3,11 @@
 REM Set the directory path
 set "dest=C:\ActiveAssist"
 set "src=%~dp0"
-set "pythonInstallationDir=%LocalAppData%\Programs\Python\Python311"
 
 echo Checking if Python is installed...
 REM Install Python
 echo Installing Python...
-"%src%\packages\python-setup.exe" /wait /quiet /passive PrependPath=1 AppendPath=1 Include_exe=1 Include_tcltk=1 Include_pip=1 Include_lib=1
+"%src%\packages\python-installer.exe" /wait /quiet /passive PrependPath=1 AppendPath=1 Include_exe=1 Include_tcltk=1 Include_pip=1 Include_lib=1
 
 REM Check the installation status
 python --version > nul 2>&1
@@ -32,12 +31,12 @@ echo Copying folders from %src% to %dest%...
 xcopy /E /I "%src%" "%dest%"
 
 echo Installing Python packages from requirements file...
-"%pythonInstallationDir%\python.exe" -m pip install -r "%dest%\requirements.txt"
+"python.exe" -m pip install -r "%src%\requirements.txt"
 
 
 echo Starting Python Windows service...
-"%pythonInstallationDir%\python.exe" "%dest%\main.py" install
-"%pythonInstallationDir%\python.exe" "%dest%\main.py" start
+"python.exe" "%dest%\main.py" install
+"python.exe" "%dest%\main.py" start
 
 echo Configuring automatic startup for the service...
 sc config ActiveAssist start=auto
