@@ -2,7 +2,7 @@ import json
 import tkinter as tk
 import tkinter.messagebox as messagebox
 
-CONFIG_FILE = "C:\\ActiveAssist\\data\\config.json"
+CONFIG_FILE = "C:\\ActiveAssist\\settings\\settings.json"
 
 def load_config():
     try:
@@ -30,6 +30,7 @@ def save_button_clicked():
     proxy_host = entry_proxy_host.get()
     proxy_port = entry_proxy_port.get()
     license_key = entry_license_key.get()
+    scan_rate = scan_rate.get()
 
     config = load_config()
     if config is None:
@@ -38,6 +39,7 @@ def save_button_clicked():
     config["proxyHost"] = proxy_host
     config["proxyPort"] = proxy_port
     config["licenseKey"] = license_key
+    config["scanRate"] = scan_rate
 
     save_config(config)
     status_label.config(text="Configuration saved successfully")
@@ -51,17 +53,17 @@ if config is None:
 # Create GUI
 root = tk.Tk()
 root.title("Proxy Configuration")
-root.geometry("400x280")
+root.geometry("400x400")
 root.resizable(False, False)
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
 # Calculate the x and y position to center the window
 x = int((screen_width - 400) / 2)
-y = int((screen_height - 280) / 2)
+y = int((screen_height - 400) / 2)
 
 # Set the window position
-root.geometry(f"400x200+{x}+{y}")
+root.geometry(f"400x400+{x}+{y}")
 root.deiconify()
 # Create input fields
 label_proxy_host = tk.Label(root, text="Proxy Host:")
@@ -75,6 +77,12 @@ label_proxy_port.pack()
 entry_proxy_port = tk.Entry(root, width=30)
 entry_proxy_port.insert(tk.END, config["proxyPort"])
 entry_proxy_port.pack()
+
+label_scan_rate = tk.Label(root, text="Scan Rate (sec):")
+label_scan_rate.pack()
+entry_scan_rate = tk.Entry(root, width=30)
+entry_scan_rate.insert(tk.END, config["scanRate"])
+entry_scan_rate.pack()
 
 label_license_key = tk.Label(root, text="License Key:")
 label_license_key.pack()

@@ -1,9 +1,6 @@
 {
     "getUrl": "http://activeassist.localhost/orgfolders/json/ip_addresses.json",
     "postUrl": "http://activeassist.localhost/ipdata.php",
-    "licenseKey": "123456789",
     "orgID": 1,
-    "serverID": "1",
-    "proxyHost": "",
-    "proxyPort": ""
+    "serverID": "1"
 }

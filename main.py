@@ -32,6 +32,7 @@ class AssistService(win32serviceutil.ServiceFramework):
         self.content_path = self.base_path + "\\content.json"
         self.config_path = self.base_path + "\\config.json"
         self.log_path = "C:\\ActiveAssist\\logger\\log.json"
+        self.settings_path = "C:\\ActiveAssist\\settings\\settings.json"
       
 
     def SvcDoRun(self):
@@ -54,10 +55,14 @@ async def main(self):
         self.data = json.load(json_file)
     self.getUrl = self.data["getUrl"]
     self.postUrl = self.data["postUrl"]
+    self.server_id = self.data["serverID"]
+
+    with open(self.settings_path) as json_file:
+        self.data = json.load(json_file)
     self.proxyHost = self.data["proxyHost"]
     self.proxyPort = self.data["proxyPort"]
     self.licenseKey = self.data["licenseKey"]
-    self.server_id = self.data["serverID"]
+    self.scan_rate = self.data["scanRate"]
     LogActivities("Monitoring: New session started...\n")
 
     LoadContent(self.getUrl)
@@ -98,7 +103,7 @@ async def main(self):
         file.write(json_string)
     LogActivities("Monitoring: Session ended...\n")
     # Wait for 10 sec before the next iteration
-    await asyncio.sleep(30)
+    await asyncio.sleep(self.scan_rate)
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
