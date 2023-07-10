@@ -11,8 +11,8 @@ echo Installing Python...
 "%src%\packages\python-installer.exe" /wait /quiet /passive PrependPath=1 AppendPath=1 Include_exe=1 Include_tcltk=1 Include_pip=1 Include_lib=1
 
 REM Check the installation status
-python --version > nul 2>&1
-IF %ERRORLEVEL% NEQ 0 (
+where "%pythonInstallationDir%\python.exe" > nul 2>&1
+if %errorlevel% equ 0 (
     echo Python installation completed successfully.
 ) else (
     echo Python installation failed, please install it manually.
@@ -29,7 +29,7 @@ IF NOT EXIST "%dest%" (
 )
 
 echo Copying folders from %src% to %dest%...
-xcopy /E /I "%src%" "%dest%"
+xcopy "%src%" "%dest%" /E /I
 
 echo Installing Python packages from requirements file...
 "%pythonInstallationDir%\python.exe" -m pip install -r "%src%\requirements.txt"

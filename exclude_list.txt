@@ -4,3 +4,4 @@ data\content.json
 logger\log.json
 .gitignore
 requirements.txt
+exclude_list.txt

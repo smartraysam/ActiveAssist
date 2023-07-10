@@ -8,14 +8,10 @@ import win32event
 import servicemanager
 import socket
 import sys
-
-
 from data.datamodel import DataToPost, DataToPostEncoder, ServerData
-from data.getdata import LoadContent
-
 from logger.log import LogActivities
 from utils.ping import ping_ip_address
-from utils.postdata import PostRequest
+from utils.requestUtils import GetContent, PostRequest
 from utils.winmonitor import get_available_ram, get_computer_name, get_cpu_usage, get_pc_space, get_physical_memory
 
 
@@ -65,7 +61,11 @@ async def main(self):
     self.scan_rate = self.data["scanRate"]
     LogActivities("Monitoring: New session started...\n")
 
-    LoadContent(self.getUrl)
+    status = GetContent(self.getUrl)
+
+    if status is False:
+        self.is_running = False
+        return
 
     with open(self.content_path) as content_file:
         data = json.load(content_file)
@@ -75,6 +75,7 @@ async def main(self):
 
     if license_key != self.licenseKey:
         LogActivities("Invalid License Key, Update the key from the setting\n")
+        self.is_running = False
         return
     org_id = data["orgID"]
     entries = data["data"]

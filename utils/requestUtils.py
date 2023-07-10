@@ -29,7 +29,29 @@ def PostRequest(url, json_string, proxy_host="", proxy_port=""):
         log = "Failed to send JSON string. Timeout\n"
     except requests.RequestException as e:
         log = f"An error occurred: {str(e)}\n"
-
     # Append the log to the log file
     LogActivities(log)
+
+
+def GetContent(url):
+    log = ""
+    status = False
+    try:
+        response = requests.get(url)
+        content ="C:\\ActiveAssist\\data\\content.json"
+        if response.status_code == 200:
+            with open(content, "w") as file:
+                file.write(response.text)
+            log = "Content data retrieved \n"
+            status = True
+        else:
+            log = "Error retrieving JSON data."
+    except requests.Timeout:
+        log = "Failed to send JSON string. Timeout\n"
+    except requests.RequestException as e:
+        log = f"An error occurred: {str(e)}\n"
+    
+    LogActivities(log)
+    return status
+
 

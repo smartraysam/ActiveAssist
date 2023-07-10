@@ -30,7 +30,7 @@ def save_button_clicked():
     proxy_host = entry_proxy_host.get()
     proxy_port = entry_proxy_port.get()
     license_key = entry_license_key.get()
-    scan_rate = scan_rate.get()
+    scan_rate = entry_scan_rate.get()
 
     config = load_config()
     if config is None:
@@ -53,17 +53,17 @@ if config is None:
 # Create GUI
 root = tk.Tk()
 root.title("Proxy Configuration")
-root.geometry("400x400")
+root.geometry("400x250")
 root.resizable(False, False)
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
 # Calculate the x and y position to center the window
-x = int((screen_width - 400) / 2)
-y = int((screen_height - 400) / 2)
+x = int((screen_width - 250) / 2)
+y = int((screen_height - 250) / 2)
 
 # Set the window position
-root.geometry(f"400x400+{x}+{y}")
+root.geometry(f"400x250+{x}+{y}")
 root.deiconify()
 # Create input fields
 label_proxy_host = tk.Label(root, text="Proxy Host:")
