@@ -18,7 +18,7 @@ async def AsyncPing(ip_address):
 
 def ping_ip_address(ip_address):
     try:
-        response_time = ping3.ping(ip_address, timeout=8)
+        response_time = ping3.ping(ip_address)
         if response_time is not None:
             return PingResult(ip_address, "Success", datetime.datetime.now().strftime("%m/%d/%Y %H:%M:%S"))
         else:
